@@ -1,24 +1,13 @@
 import flet as ft
 from UI.alert import AlertManager
 
-'''
-    VIEW:
-    - Rappresenta l'interfaccia utente
-    - Riceve i dati dal MODELLO e li presenta senza modificarli
-'''
-
 class View:
     def __init__(self, page: ft.Page):
-        # Page
         self.page = page
         self.page.title = "Lab07"
         self.page.horizontal_alignment = "center"
         self.page.theme_mode = ft.ThemeMode.DARK
-
-        # Alert
         self.alert = AlertManager(page)
-
-        # Controller
         self.controller = None
 
     def show_alert(self, messaggio):
@@ -31,39 +20,49 @@ class View:
         self.page.update()
 
     def load_interface(self):
-        """ Crea e aggiunge gli elementi di UI alla pagina e la aggiorna. """
-        # --- Sezione 1: Intestazione ---
         self.txt_titolo = ft.Text(value="Musei di Torino", size=38, weight=ft.FontWeight.BOLD)
 
-        # --- Sezione 2: Filtraggio ---
-        # TODO
+        self._museo_dropdown = ft.Dropdown(
+            label="Seleziona un museo",
+            options=[],
+            width=300,
+            on_change=lambda e: self.controller.on_museo_changed(e)
+        )
 
-        # Sezione 3: Artefatti
-        # TODO
+        self._epoca_dropdown = ft.Dropdown(
+            label="Seleziona un'epoca",
+            options=[],
+            width=300,
+            on_change=lambda e: self.controller.on_epoca_changed(e)
+        )
 
-        # --- Toggle Tema ---
+        self._btn_mostra = ft.ElevatedButton(
+            text="Mostra Artefatti",
+            on_click=lambda e: self.controller.mostra_artefatti(e)
+        )
+
+        self._list_view = ft.ListView(
+            expand=True,
+            spacing=10,
+            padding=10,
+            auto_scroll=False
+        )
+
         self.toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=self.cambia_tema)
 
-        # --- Layout della pagina ---
         self.page.add(
             self.toggle_cambia_tema,
-
-            # Sezione 1
             self.txt_titolo,
             ft.Divider(),
-
-            # Sezione 2: Filtraggio
-            # TODO
-
-            # Sezione 3: Artefatti
-            # TODO
+            ft.Row([self._museo_dropdown, self._epoca_dropdown], alignment=ft.MainAxisAlignment.CENTER),
+            ft.Row([self._btn_mostra], alignment=ft.MainAxisAlignment.CENTER),
+            ft.Container(self._list_view, expand=True, padding=10, height=400)
         )
 
         self.page.scroll = "adaptive"
         self.page.update()
 
     def cambia_tema(self, e):
-        """ Cambia tema scuro/chiaro """
         self.page.theme_mode = ft.ThemeMode.DARK if self.toggle_cambia_tema.value else ft.ThemeMode.LIGHT
         self.toggle_cambia_tema.label = "Tema scuro" if self.toggle_cambia_tema.value else "Tema chiaro"
         self.page.update()
